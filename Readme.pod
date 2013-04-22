@@ -1,0 +1,112 @@
+=pod
+
+=head1 NAME
+
+XML::Loy::XStandoff - read and Write XStandoff documents
+
+
+=head1 SYNOPSIS
+
+  use XML::Loy::XStandoff;
+
+  my $xsf = XML::Loy::XStandoff->new('corpus');
+
+  $xsf->corpus_data(id => 'cs_1')->
+
+
+=head1 DESCRIPTION
+
+L<XStandoff|http://xstandoff.net/>
+
+=head1 METHODS
+
+=head2 new
+
+  my $corpus = XML::Loy::XStandoff->new('corpus');
+  my $cd = XML::Loy::XStandoff->new('corpusData');
+
+=head2 corpus_data
+
+  $corpus->corpus_data(id => 'cd-1');
+  my $cd = $corpus->corpus_data('cd-1');
+  my $cd = $corpus->corpus_data;
+
+Get or add corpus data to the corpus.
+
+
+=head2 meta
+
+  $cd->meta(uri => '/meta.xml');
+  $cd->meta(uri => 'http://.../meta.xml');
+
+  $cd->meta->
+  $cd->meta(as => [-Loy, -DublinCore])->dc('Title');
+
+
+=head2 primary_data
+
+  $cd->primary_data(uri => '/text.txt');
+  $cd->primary_data(uri => 'http://.../text.txt');
+  $cd->primary_data(file => '/text.txt');
+  $cd->primary_data('Hello World');
+
+
+=head2 textual_content
+
+=head2 segment
+
+  my $id = $cd->segment(4, 5);
+  my $id = $cd->segment(4, 5, 'seg-1');
+
+  my $seg = $cd->segment($id);
+  print $seg->attrs('start');
+
+=head2 segment_content
+
+  my $content = $cd->segment_content('seg-1');
+  my $content = $cd->segment_content('seg-1' => 'war');
+  my $content = $cd->segment_content('seg-1' => sub {
+    return lc $_[0];
+  });
+
+  my $content = $seg->segment_content;
+  my $content = $seg->segment_content('war');
+  my $content = $seg->segment_content(sub {
+    return lc $_[0];
+  });
+
+
+=head2 seg
+
+  # Add attributes to nodes
+  $xml->seg('seg-4');
+  print $xml->seg;
+
+=head2 annotation
+
+=head2 level
+
+=head2 layer
+
+=head1 DEPENDENCIES
+
+L<XML::Loy>.
+
+=head1 SEE ALSO
+
+L<XML::Loy>, L<XStandoff.net|http://xstandoff.net/>.
+
+
+=head1 AVAILABILITY
+
+  https://github.com/Akron/XML-Loy-XStandoff
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, L<Nils Diewald|http://nils-diewald.de/>.
+
+This program is free software, you can redistribute it
+and/or modify it under the same terms as Perl.
+
+=cut
