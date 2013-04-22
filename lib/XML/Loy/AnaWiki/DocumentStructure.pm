@@ -98,8 +98,8 @@ XML::Loy::AnaWiki::DocumentStructure - Handling AnaWiki Document Structure
 
 =head1 DESCRIPTION
 
-L<XML::Loy::AnaWiki::DocumentStructure> is an L<XML::Loy> base class
-for dealin with Document Structures as used in the AnaWiki project.
+L<XML::Loy::AnaWiki::DocumentStructure> is an L<XML::Loy> class
+for dealing with Document Structures as used in the AnaWiki project.
 
 This code may help you to create your own L<XML::Loy> extensions.
 
