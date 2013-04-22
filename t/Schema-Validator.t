@@ -28,12 +28,11 @@ is($corpus->primary_data->attrs('start'), 0, 'Start of textual data');
 ok(my $s = $corpus->level->layer->ds_para(pos => 0)->ds_sentence(pos => 0), 'First sentence');
 
 foreach my $w ($s->children('word')->each) {
-  is($w->attrs('surface'), $corpus->segment_content($w->attrs('xsf:segment')),
+  is($w->attrs('surface'), $w->segment_content,
      'Word matches');
 };
 
 my $loc = 'http://www.xstandoff.net/2009/xstandoff/1.1/xsf.xsd';
-
 
 ok(my $c = $corpus->extension('-Schema::Validator')->validate($loc), 'Validate');
 

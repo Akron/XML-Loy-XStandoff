@@ -75,13 +75,14 @@ sub primary_data {
     $self = $self->parent or return;
   };
 
+  # Get primary data
   unless ($_[1]) {
     return $self->at('primaryData[xml\:id="' . $_[0] . '"]') if $_[0];
     return $self->at('primaryData');
   }
   else {
     my %param = @_;
-    $param{'xml:id'} = delete $param{id} if exists $param{id};
+    $param{'xml:id'} //= delete $param{id} if exists $param{id};
     return $self->add(primaryData => \%param);
   };
 };
@@ -110,7 +111,7 @@ sub textual_content {
 };
 
 
-
+# Create segmentation element
 sub segmentation {
   my $self = shift;
 
@@ -129,6 +130,7 @@ sub segmentation {
 };
 
 
+# Create or retrieve an annotation element
 sub annotation {
   my $self = shift;
 
@@ -146,7 +148,7 @@ sub annotation {
   return ($self->at('annotation') or $self->set(annotation => @_));
 };
 
-
+# Create or retrieve a level element
 sub level {
   my $self = shift;
 
@@ -172,13 +174,14 @@ sub level {
 };
 
 
+# Create or retrieve a layer element
 sub layer {
   my $self = shift;
 
   $self = $self->at('*') unless $self->type;
 
   if ($self->type =~ /^(?:xsf:)?(corpus(?:Data)?|level|annotation)?$/) {
-    $self = ($self->at('level') or $self->level( id => 'l-' . $UUID->create_str ));
+    $self = ($self->at('level') or $self->level( id => 'lev-' . $UUID->create_str ));
   }
   else {
     while ($self->type !~ /^(?:xsf:)?level$/) {
@@ -193,20 +196,31 @@ sub layer {
 };
 
 
+# Add or retrieve segment elements
 sub segment {
   my $self = shift;
 
+  # Retrieve segment
   if (@_ == 1) {
     my $id = shift;
+
+    unless ($self->type =~ /^(?:xsf:)?segmentation/) {
+      while ($self->type !~ /^(?:xsf:)?corpusData$/) {
+	$self = $self->parent or return;
+      };
+    };
 
     return $self->at('segment[xml\:id=' . $id . ']');
   }
 
+  # Add or modify segment
   else {
-    my $start = shift;
-    my $end   = shift;
+    my $end   = pop;
+    my $start = pop;
     my $id    = shift || 'seg-' . $UUID->create_str;
-    if ($self->at("segment[xml\:id=$id]")) {
+    if (my $seg = $self->at("segment[xml\:id=$id]")) {
+      $seg->attrs(start => $start);
+      $seg->attrs(end => $end);
       return $id;
     }
     else {
@@ -226,6 +240,7 @@ sub segment {
 };
 
 
+# Add or get segment attribute to element
 sub seg {
   my $self = shift;
   return $self->attrs('xsf:segment') unless $_[0];
@@ -238,24 +253,23 @@ sub seg {
 };
 
 
+# Retrieve, replace or modify segment content
 sub segment_content {
   my $self = shift;
+  my $replace = shift;
 
-  my $id;
-  if ($self->type =~ /^(xsf:)segment$/) {
-    $id = $self->attrs('xml:id');
+  my ($id, $seg);
+  if ($self->type =~ /^(?:xsf:)?segment$/) {
+    $seg = $self;
   }
   else {
-    $id = shift;
+    $id = $self->seg;
+    $seg = $self->segmentation->segment($id);
   };
-
-  my $seg = $self->segmentation->segment($id);
 
   return unless $seg;
 
   my $attrs = $seg->attrs;
-
-  my $replace = shift;
 
   return $self->primary_data->textual_content->string(
     $attrs->{start},
@@ -265,12 +279,15 @@ sub segment_content {
 };
 
 
+# Autosave primary data on change
 sub _on_file_change {
   my $self = shift;
   my $data = shift;
   b($data->string)->spurt($data->file);
 };
 
+
+# Change segment range in case the primary data is changed
 sub _on_length_change {
   my $self = shift;
   my $data = shift;
@@ -299,6 +316,7 @@ sub _on_length_change {
 };
 
 
+# External or internal reference type for meta and textual content
 sub _ref_type {
   my $self = shift;
 
@@ -321,16 +339,24 @@ sub _ref_type {
     my @as = $param{as} ? (ref($param{as}) ? @{$param{as}} : $param{as}) : ();
 
     my ($data, $rv);
+
+    # node is found
     if ($data = $self->at($content)) {
+
+      # Return raw
       if ($type eq 'raw') {
 	my $data_obj =
 	  XML::Loy::XStandoff::Data->new($data->text);
+
+	# On change, replace the content
 	$data_obj->on(
 	  on_change => sub {
 	    my $d = shift;
 	    $data->replace_content($d->string);
 	  }
 	);
+
+	# On length change, update primary data segments
 	$data_obj->on(
 	  on_length_change => sub {
 	    $self->_on_length_change(@_)
@@ -349,17 +375,23 @@ sub _ref_type {
       if ($ref =~ s!^file://!! or $ref !~ /^[a-zA-Z]+:/) {
 
 	if ($type eq 'raw') {
+
+	  # Load file
 	  $data = XML::Loy::XStandoff::Data->new(
 	    b($ref)->slurp
 	  );
 
+	  # Set file information
 	  $data->file($ref);
 
+	  # On change, replace the content
 	  $data->on(
 	    on_change => sub {
 	      $self->_on_file_change(@_)
 	    }
 	  );
+
+	  # On length change, update primary data
 	  $data->on(
 	    on_length_change => sub {
 	      $self->_on_length_change(@_)
@@ -368,6 +400,7 @@ sub _ref_type {
 	  return $data;
 	};
 
+	# Load as XML::Loy document
 	my $xml = XML::Loy::File->new($ref);
 	$xml = $xml->as(@as, -File) if @as;
 	return $xml;
@@ -387,7 +420,30 @@ sub _ref_type {
 	return XML::Loy->new($data)->as(@as);
       };
     }
+
+    # Create node
     else {
+      if ($type eq 'raw') {
+	my $data_obj =
+	  XML::Loy::XStandoff::Data->new;
+
+	# On change, replace the content
+	$data_obj->on(
+	  on_change => sub {
+	    my $d = shift;
+	    $data->replace_content($d->string);
+	  }
+	);
+
+	# On length change, update primary data segments
+	$data_obj->on(
+	  on_length_change => sub {
+	    $self->_on_length_change(@_)
+	  }
+	);
+	return $data_obj;
+      };
+
       return $self->set($content);
     };
   };
@@ -397,6 +453,11 @@ sub _ref_type {
   if (exists $param{file} || exists $param{uri}) {
     if ($param{file}) {
       $data = b( $param{file} )->slurp;
+      # Is a document
+      if ($type ne 'raw') {
+	$self->find($content_ref)->pluck('remove');
+	return $self->set($content)->add( $self->new($data) );
+      };
     }
     elsif ($param{'uri'}) {
       $self->find($content)->pluck('remove');
@@ -422,7 +483,7 @@ __END__
 
 =head1 NAME
 
-XML::Loy::XStandoff - read and Write XStandoff documents
+XML::Loy::XStandoff - Read and Write XStandoff Documents
 
 
 =head1 SYNOPSIS
@@ -500,6 +561,16 @@ Create a new L<XML::Loy::XStandoff> document, either as
 a C<corpus> or a C<corpusData> element.
 
 
+=head2 annotation
+
+  my $anno = $cd->annotation;
+
+  $cd->annotation->add('level');
+
+Retrieve an C<annotation> element and set it, if it doesn't exist
+(along with a C<corpusData> element.
+
+
 =head2 corpus_data
 
   $corpus->corpus_data(id => 'cd-1');
@@ -511,61 +582,173 @@ accepts a parameter hash for setting or a single id parameter for getting.
 Giving no parameter will return the first corpus data node.
 If no corpus data exists, a new node is introduced with an autogenerated id.
 
+
+=head2 layer
+
+  my $lay = $a->layer('xml:id' => 'lay-1');
+  my $lay = $a->layer('lay-1');
+  my $lay = $a->layer;
+
+Add an annotation layer to the annotation level or retrieve it.
+
+Accepts a hash of attributes for adding a new C<layer>
+element.
+
+For retrieval it accepts an id value. If no value is passed, the first
+element in document order is returned. In case no C<layer> element
+exists, it is created (along with a C<level>, an C<annotation>, and a
+C<corpusData> element).
+
+
+=head2 level
+
+  my $lev = $a->level('xml:id' => 'lev-1');
+  my $lev = $a->level('lev-1');
+  my $lev = $a->level;
+
+Add an annotation level to the annotation or retrieve it.
+
+Accepts a hash of attributes for adding a new C<level>
+element.
+
+For retrieval it accepts an id value. If no value is passed, the first
+element in document order is returned. In case no C<level> element
+exists, it is created (along with an C<annotation> and a C<corpusData>
+element).
+
+
 =head2 meta
 
-  $cd->meta->
+  my $meta = $cd->meta;
 
-  $cd->meta(uri => '/meta.xml');
-  $cd->meta(uri => 'http://.../meta.xml');
-  $cd->meta(as => [-Loy, -DublinCore])->dc('Title');
+  $cd->meta->add('dc:title' => 'My title');
 
-Set or get meta information of the current node.
-Accepts a parameter hash for setting or an
+  $cd->meta(uri  => '/meta.xml');
+  $cd->meta(file => '/meta.xml');
+  $cd->meta(uri  => 'http://.../meta.xml');
+  $cd->meta(as   => [-Loy, -DublinCore])->dc('Title');
+
+Set meta information of the current node or retrieve it.
+
+If no parameter is given, the content of the C<meta> element is returned.
+If no C<meta> element exists, but a C<metaRef> element exists,
+the referenced document is returned (either from a local file or an URI).
+If a parameter C<as> is given,
+the passed array reference is used to transform the document
+using the L<as|XML::Loy/as> method of L<XML::Loy>.
+If no meta document is associated to the node, it is created empty.
+
+If a C<file> parameter is passed, the content of the document is embedded
+as a child of the meta element. If a C<uri> parameter is passed, a
+C<metaRef> node is created.
+
+B<Note>: External meta documents will be extended with L<XML::Loy::File>
+and thus have to be stored separately when changed.
+
 
 =head2 primary_data
 
-  $cd->primary_data(uri => '/text.txt');
-  $cd->primary_data(uri => 'http://.../text.txt');
-  $cd->primary_data(file => '/text.txt');
-  $cd->primary_data('Hello World');
+  my $pd = $cd->primary_data('xml:id' => 'pd-1');
+  my $pd = $cd->primary_data('pd-1');
+  my $pd = $cd->primary_data;
 
+Add primary data to corpus data or retrieve it.
 
-=head2 textual_content
+Accepts a hash of attributes for adding a new C<primaryData>
+element.
 
-=head2 segment
+For retrieval it accepts an id value. If no value is passed, the first
+element in document order is returned. In case no C<primaryData> element
+exists, it is created (along with a C<corpusData> element).
 
-  my $id = $cd->segment(4, 5);
-  my $id = $cd->segment(4, 5, 'seg-1');
-
-  my $seg = $cd->segment($id);
-  print $seg->attrs('start');
 
 =head2 segment_content
 
-  my $content = $cd->segment_content('seg-1');
-  my $content = $cd->segment_content('seg-1' => 'war');
-  my $content = $cd->segment_content('seg-1' => sub {
+  print $lay->at('token')->segment_content;
+  print $cd->segment('seg-1')->segment_content;
+
+  $lay->at('token')->segment_content('new');
+  $lay->at('token')->segment_content(sub {
     return lc $_[0];
   });
 
-  my $content = $seg->segment_content;
-  my $content = $seg->segment_content('war');
-  my $content = $seg->segment_content(sub {
-    return lc $_[0];
-  });
+Retrieve, replace or modify the content of a specific segment.
+If invoked by a C<segment> node, takes this segment, otherwise
+takes the C<xsf:segment> attribute value of the invoking node.
+
+If no parameter is given, returns the textual content of the segment.
+Accepts a string parameter, that replaces the textual content of the
+segment.
+Accepts a callback method, that accepts the textual content of
+the segment and returns a string to replace the textual content.
+
+On change, the primary data (either embedded or on a local filesystem)
+and segments are updated.
+
+
+=head2 segmentation
+
+  my $seg = $cd->segmentation;
+
+  $cd->segmentation->add('segment');
+
+Retrieve a C<segmentation> element and set it, if it doesn't exist
+(along with a C<corpusData> element.
+
+
+=head2 segment
+
+  my $seg = $cd->segment('seg-1');
+  print $seg->attrs('start');
+
+  my $seg_id = $cd->segment(14, 20);
+  my $seg_id = $cd->segment(14, 20);
+  $cd->segment('seg-1', 14, 21);
+
+Add or retrieve segments.
+
+Accepts a segment id for retrieving a segment.
+Accepts two integers for defining start and end position of the segment.
+Accepts a segment id, followed by two integers for
+modifying start and end position of the segment.
 
 
 =head2 seg
 
-  # Add attributes to nodes
-  $xml->seg('seg-4');
-  print $xml->seg;
+  $lay->add('token')->seg('seg-1');
+  # <token xsf:segment="seg-1" />
 
-=head2 annotation
+  print $lay->at('token')->seg;
+  # seg-1
 
-=head2 level
+Attach segment information to arbitrary elements or retrieve it.
 
-=head2 layer
+
+=head2 textual_content
+
+  $pd->textual_content(uri => '/text.txt');
+  $pd->textual_content(uri => 'http://.../text.txt');
+  $pd->textual_content(file => '/text.txt');
+  $pd->textual_content('Hello World');
+
+  print $pd->textual_content;
+
+Add textual data to corpus data or retrieve it.
+
+If no parameter is given, the content of the C<textualContent>
+element is returned as an L<XML::Loy::XStandoff::Data> object.
+If no C<textualContent> element exists, but a C<primaryDataRef> element exists,
+the referenced document is returned (either from a local file or an URI).
+If no textual content is associated to the primary data, it is created empty
+and returned as an L<XML::Loy::XStandoff::Data> object.
+
+If a C<file> parameter is passed, the content of the file
+is embedded as the content of the C<textualContent> element.
+If a C<uri> parameter is passed, a C<primaryDataRef> node is created.
+
+B<Note>: External textual content files referenced by a URI cannot be
+altered using L<segment_content|/segment_content>.
+
 
 =head1 DEPENDENCIES
 
@@ -573,7 +756,10 @@ L<XML::Loy>.
 
 =head1 SEE ALSO
 
-L<XML::Loy>, L<XStandoff.net|http://xstandoff.net/>.
+L<XML::Loy>,
+L<XML::Loy::XStandoff::Data>,
+L<XML::Loy::File>,
+L<XStandoff.net|http://xstandoff.net/>.
 
 
 =head1 AVAILABILITY

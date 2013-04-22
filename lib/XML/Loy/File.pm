@@ -14,7 +14,8 @@ sub new {
 
   return $class->SUPER::new unless $file;
 
-  my $data = Mojo::ByteStream->new($file)->slurp;
+  my $data = Mojo::ByteStream->new($file)->slurp->decode->encode;
+
   my $self = $class->SUPER::new($data);
   $self->file($file);
   return $self;

@@ -7,8 +7,6 @@ use Mojo::ByteStream 'b';
 use File::Temp qw/:POSIX/;
 use utf8;
 
-$|++;
-
 my $LIVE = 0;
 
 use FindBin;
@@ -91,33 +89,33 @@ ok(my $id3 = $segs->segment(9, 13), 'Segment');
 is($segs->segment($id3)->attrs('start'), 9, 'Segment');
 is($segs->segment($id3)->attrs('end'), 13, 'Segment');
 
-is($pd->segment_content($id1), 'Dies', 'Correct substring');
-
-is($pd->segment_content($id2), 'ist', 'Correct substring');
-is($pd->segment_content($id3), 'mein', 'Correct substring');
+is($segs->segment($id1)->segment_content, 'Dies', 'Correct substring');
+is($segs->segment($id2)->segment_content, 'ist', 'Correct substring');
+is($segs->segment($id3)->segment_content, 'mein', 'Correct substring');
 
 
 ok(my $id4 = $segs->segment(14, 18), 'Segment');
-is($pd->segment_content($id4), 'Text', 'Correct substring');
+
+is($segs->segment($id4)->segment_content, 'Text', 'Correct substring');
 
 ok(my $id5 = $segs->segment(0, 19), 'All Segment');
 
-is($pd->segment_content($id5), 'Dies ist mein Text.',
+is($segs->segment($id5)->segment_content, 'Dies ist mein Text.',
    'Correct substring');
 
-is($pd->segment_content(
-  $id2 => sub {
+is($segs->segment($id2)->segment_content(
+  sub {
     return uc shift();
   }), 'IST', 'Correct substring');
 
 is($pd->textual_content, 'Dies IST mein Text.', 'Get textual content');
 
-is($pd->segment_content(
-  $id2 => sub {
+is($segs->segment($id2)->segment_content(
+  sub {
     return 'wäre';
   }), 'wäre', 'Correct substring');
 
-is($pd->segment_content($id3), 'mein', 'Correct substring');
+is($segs->segment($id3)->segment_content, 'mein', 'Correct substring');
 
 is($segs->segment($id3)->attrs('start'), 10, 'Segment');
 is($segs->segment($id3)->attrs('end'), 14, 'Segment');
@@ -126,7 +124,7 @@ is($segs->segment($id3)->attrs('end'), 14, 'Segment');
 is($segs->segment($id3)->attrs('start'), 10, 'Segment');
 is($segs->segment($id3)->attrs('end'), 14, 'Segment');
 
-is($pd->segment_content($id5), 'Dies wäre mein Text.',
+is($segs->segment($id5)->segment_content, 'Dies wäre mein Text.',
    'Correct substring');
 
 
@@ -145,18 +143,18 @@ is($segs->segment($id1)->attrs('start'), 0, 'Segment');
 is($segs->segment($id1)->attrs('end'), 4, 'Segment');
 
 
-is($cd->segment_content($id1), 'Dies', 'Correct substring');
-is($cd->segment_content($id2), 'wäre', 'Correct substring');
-is($cd->segment_content($id3), 'mein', 'Correct substring');
-is($cd->segment_content($id4), 'Text', 'Correct substring');
+is($cd->segment($id1)->segment_content, 'Dies', 'Correct substring');
+is($cd->segment($id2)->segment_content, 'wäre', 'Correct substring');
+is($cd->segment($id3)->segment_content, 'mein', 'Correct substring');
+is($cd->segment($id4)->segment_content, 'Text', 'Correct substring');
 
 # Change on disk
-ok($pd->segment_content($id1 => 'Das'), 'Change on disk');
+ok($pd->segment($id1)->segment_content('Das'), 'Change on disk');
 
-is($cd->segment_content($id1), 'Das', 'Correct substring');
-is($cd->segment_content($id2), 'wäre', 'Correct substring');
-is($cd->segment_content($id3), 'mein', 'Correct substring');
-is($cd->segment_content($id4), 'Text', 'Correct substring');
+is($cd->segment($id1)->segment_content, 'Das', 'Correct substring');
+is($cd->segment($id2)->segment_content, 'wäre', 'Correct substring');
+is($cd->segment($id3)->segment_content, 'mein', 'Correct substring');
+is($cd->segment($id4)->segment_content, 'Text', 'Correct substring');
 
 is($pd->textual_content, 'Das wäre mein Text.', 'Disk data');
 
