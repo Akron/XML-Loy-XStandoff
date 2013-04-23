@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xmlns:dc="http://purl.org/dc/elements/1.1/">  
+  <rdf:Description>
+    <dc:creator>Nils Diewald</dc:creator>
+    <dc:creator>Maik Stührenberg</dc:creator>
+    <dc:title>An API for homogeneous treatment of heterogeneous markup</dc:title>
+    <dc:language>EN</dc:language>
+  </rdf:Description>
+</rdf:RDF>

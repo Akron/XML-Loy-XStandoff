@@ -106,7 +106,16 @@ sub textual_content {
   my $tc = $self->_ref_type(qw/textualContent primaryDataRef raw/, @_);
   my $pd = $self->primary_data;
   $pd->attrs(start => 0);
-  $pd->attrs(end => length($tc));
+
+  my $end;
+  if (blessed $tc eq 'XML::Loy::XStandoff::Data') {
+    $end = length($tc);
+  }
+  else {
+    $end = length($tc->text);
+  };
+
+  $pd->attrs(end => $end);
   return $tc;
 };
 
@@ -311,8 +320,8 @@ sub _on_length_change {
 
   my $pd = $self->primary_data;
   my $tc = $pd->textual_content;
-  $pd->attrs(start => 0);
-  $pd->attrs(end => length $tc);
+#  $pd->attrs(start => 0);
+#  $pd->attrs(end => length($tc));
 };
 
 

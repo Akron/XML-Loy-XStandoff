@@ -1,4 +1,6 @@
-0.02 2013-04-22
+0.02 2013-04-23
+        - Changed API for segment_content.
+	- Fixed bug in primary data count.
         - Initial release to GitHub.
 
 0.01 2013-04-11
