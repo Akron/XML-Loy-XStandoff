@@ -66,7 +66,10 @@ sub string {
   };
 
   unless ($replace) {
-    return substr( ${ $self->data }, $start, $length);
+    my $s = ${ $self->data };
+    my $rv = substr( $s, $start, $length);
+    $self->data($s);
+    return $rv;
   };
 
   if ($self->unchangeable) {
@@ -75,14 +78,16 @@ sub string {
 
   my ($old, $new);
 
+  my $s = ${ $self->data };
   if (ref $replace && ref $replace eq 'CODE') {
-    $old = substr( ${ $self->data }, $start, $length);
+    $old = substr( $s, $start, $length);
     $new = $replace->( $old );
-    substr(${$self->data}, $start, $length, $new);
+    substr( $s, $start, $length, $new);
   } else {
-    $old = substr(${$self->data}, $start, $length, $replace);
+    $old = substr($s, $start, $length, $replace);
     $new = $replace;
   };
+  $self->data($s);
 
 
   if ((length($old) - length($new)) != 0) {
