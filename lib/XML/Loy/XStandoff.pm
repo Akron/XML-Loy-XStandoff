@@ -10,7 +10,7 @@ use XML::Loy with => (
   }
 );
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use XML::Loy::XStandoff::Data;
 use XML::Loy::File;
@@ -577,7 +577,7 @@ a C<corpus> or a C<corpusData> element.
   $cd->annotation->add('level');
 
 Retrieve an C<annotation> element and set it, if it doesn't exist
-(along with a C<corpusData> element.
+(along with a C<corpusData> element).
 
 
 =head2 corpus_data

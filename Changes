@@ -1,3 +1,7 @@
+0.03 2013-07-11
+        - Bundle example extensions for
+	  Morphemes and Syllables.
+
 0.02 2013-04-23
         - Changed API for segment_content.
 	- Fixed bug in primary data count.
