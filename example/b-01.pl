@@ -9,7 +9,7 @@ use XML::Loy::XStandoff;
 my $cd = XML::Loy::XStandoff->new('corpusData');
 
 # Set textual content embedded
-$cd->textual_content('The sun shines brighter');
+$cd->textual_content('The sun shines brighter.');
 
 # Create segmentation
 my $seg = $cd->segmentation;

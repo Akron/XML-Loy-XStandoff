@@ -382,12 +382,11 @@ sub _ref_type {
 
       # Is local
       if ($ref =~ s!^file://!! or $ref !~ /^[a-zA-Z]+:/) {
-
 	if ($type eq 'raw') {
 
 	  # Load file
 	  $data = XML::Loy::XStandoff::Data->new(
-	    b($ref)->slurp
+	    b($ref)->slurp->decode->to_string
 	  );
 
 	  # Set file information
