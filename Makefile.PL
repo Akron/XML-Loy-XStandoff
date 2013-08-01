@@ -14,8 +14,8 @@ WriteMakefile(
     'Test::Warn' => '0.24'
   },
   PREREQ_PM => {
-    'Mojolicious' => '3.93',
-    'XML::Loy'    => '0.17',
+    'Mojolicious' => '4.23',
+    'XML::Loy'    => '0.19',
     'Data::UUID'  => '1.218',
     'Time::Local' => 0,
     'XML::LibXML' => '2'
