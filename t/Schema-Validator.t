@@ -18,17 +18,17 @@ foreach ($doc->tokenize) {
   ok($sentence->ds_word({surface => $_->[0]})->seg($_->[1]), 'Add word');
 };
 
-is($corpus->at(':root')->attrs('xmlns:ds'), 'http://www.text-technology.de/anawiki/ds', 'ds ns');
+is($corpus->at(':root')->attr('xmlns:ds'), 'http://www.text-technology.de/anawiki/ds', 'ds ns');
 
-is($corpus->at(':root')->attrs('xmlns:xsf'), 'http://www.xstandoff.net/2009/xstandoff/1.1', 'xsf ns');
+is($corpus->at(':root')->attr('xmlns:xsf'), 'http://www.xstandoff.net/2009/xstandoff/1.1', 'xsf ns');
 
-is($corpus->primary_data->attrs('end'), 19, 'End of textual data');
-is($corpus->primary_data->attrs('start'), 0, 'Start of textual data');
+is($corpus->primary_data->attr('end'), 19, 'End of textual data');
+is($corpus->primary_data->attr('start'), 0, 'Start of textual data');
 
 ok(my $s = $corpus->level->layer->ds_para(pos => 0)->ds_sentence(pos => 0), 'First sentence');
 
 foreach my $w ($s->children('word')->each) {
-  is($w->attrs('surface'), $w->segment_content,
+  is($w->attr('surface'), $w->segment_content,
      'Word matches');
 };
 

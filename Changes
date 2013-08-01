@@ -1,3 +1,7 @@
+0.04 2013-08-01
+        - Update for XML::Loy 0.19 and
+	  Mojolicious 4.23.
+
 0.03 2013-07-11
         - Bundle example extensions for
 	  Morphemes and Syllables.

@@ -10,7 +10,7 @@ use XML::Loy with => (
   }
 );
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use XML::Loy::XStandoff::Data;
 use XML::Loy::File;
@@ -104,8 +104,9 @@ sub textual_content {
   };
 
   my $tc = $self->_ref_type(qw/textualContent primaryDataRef raw/, @_);
+
   my $pd = $self->primary_data;
-  $pd->attrs(start => 0);
+  $pd->attr(start => 0);
 
   my $end;
   if (blessed $tc eq 'XML::Loy::XStandoff::Data') {
@@ -115,7 +116,7 @@ sub textual_content {
     $end = length($tc->text);
   };
 
-  $pd->attrs(end => $end);
+  $pd->attr(end => $end);
   return $tc;
 };
 
@@ -228,8 +229,8 @@ sub segment {
     my $start = pop;
     my $id    = shift || 'seg-' . $UUID->create_str;
     if (my $seg = $self->at("segment[xml\:id=$id]")) {
-      $seg->attrs(start => $start);
-      $seg->attrs(end => $end);
+      $seg->attr(start => $start);
+      $seg->attr(end => $end);
       return $id;
     }
     else {
@@ -252,13 +253,13 @@ sub segment {
 # Add or get segment attribute to element
 sub seg {
   my $self = shift;
-  return $self->attrs('xsf:segment') unless $_[0];
+  return $self->attr('xsf:segment') unless $_[0];
 
   if (blessed $_[0]) {
-    return $self->attrs('xsf:segment' => shift->attrs('xml:id'));
+    return $self->attr('xsf:segment' => shift->attr('xml:id'));
   };
 
-  return $self->attrs('xsf:segment' => shift);
+  return $self->attr('xsf:segment' => shift);
 };
 
 
@@ -278,7 +279,7 @@ sub segment_content {
 
   return unless $seg;
 
-  my $attrs = $seg->attrs;
+  my $attrs = $seg->attr;
 
   return $self->primary_data->textual_content->string(
     $attrs->{start},
@@ -307,7 +308,7 @@ sub _on_length_change {
   $self->segmentation->children('segment')->each(
     sub {
       my $seg = shift;
-      my $attrs = $seg->attrs;
+      my $attrs = $seg->attr;
 
       if ($attrs->{start} >= $end) {
 	$attrs->{start} += $diff
@@ -320,8 +321,8 @@ sub _on_length_change {
 
   my $pd = $self->primary_data;
   my $tc = $pd->textual_content;
-#  $pd->attrs(start => 0);
-#  $pd->attrs(end => length($tc));
+#  $pd->attr(start => 0);
+#  $pd->attr(end => length($tc));
 };
 
 
@@ -378,7 +379,7 @@ sub _ref_type {
 
     # Is reference
     elsif ($data = $self->at($content_ref)) {
-      my $ref = $data->attrs('uri');
+      my $ref = $data->attr('uri');
 
       # Is local
       if ($ref =~ s!^file://!! or $ref !~ /^[a-zA-Z]+:/) {
@@ -707,7 +708,7 @@ Retrieve a C<segmentation> element and set it, if it doesn't exist
 =head2 segment
 
   my $seg = $cd->segment('seg-1');
-  print $seg->attrs('start');
+  print $seg->attr('start');
 
   my $seg_id = $cd->segment(14, 20);
   my $seg_id = $cd->segment(14, 20);

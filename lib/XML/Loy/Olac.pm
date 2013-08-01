@@ -38,12 +38,12 @@ foreach my $name (qw/role
     $self = $self->at('*') unless $self->parent;
 
     if (@_ == 1) {
-      $self->attrs('xsi:type'  => $olac_name);
-      $self->attrs('olac:code' => lc shift);
+      $self->attr('xsi:type'  => $olac_name);
+      $self->attr('olac:code' => lc shift);
     }
 
-    elsif ($self->attrs('xsi:type') eq $olac_name) {
-      return $self->attrs('olac:code');
+    elsif ($self->attr('xsi:type') eq $olac_name) {
+      return $self->attr('olac:code');
     };
 
     return $self;

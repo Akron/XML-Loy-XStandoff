@@ -69,11 +69,11 @@ for ('author') {
 $olac->dc(title => 'Example');
 $olac->dc(description => 'This is an example');
 
-is($olac->at('*')->attrs('xmlns:xsi'),
+is($olac->at('*')->attr('xmlns:xsi'),
    'http://www.w3.org/2001/XMLSchema-instance',
    'XSI');
 
-is($olac->at('*')->attrs('xmlns:olac'),
+is($olac->at('*')->attr('xmlns:olac'),
    'http://www.language-archives.org/OLAC/1.0/',
    'OLAC');
 
@@ -88,11 +88,11 @@ for ('author') {
 $olac->dc(title => 'Example');
 $olac->dc(description => 'This is an example');
 
-is($olac->at('*')->attrs('xmlns:xsi'),
+is($olac->at('*')->attr('xmlns:xsi'),
    'http://www.w3.org/2001/XMLSchema-instance',
    'XSI');
 
-is($olac->at('*')->attrs('xmlns:olac'),
+is($olac->at('*')->attr('xmlns:olac'),
    'http://www.language-archives.org/OLAC/1.0/',
    'OLAC');
 

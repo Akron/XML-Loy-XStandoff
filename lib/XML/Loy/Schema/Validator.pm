@@ -18,7 +18,7 @@ sub validate {
 
   # Get schema location from root
   unless ($schema_loc) {
-    ($ns, $schema_loc) = split /\s/, $root->attrs('xsi:schemaLocation');
+    ($ns, $schema_loc) = split /\s/, $root->attr('xsi:schemaLocation');
   };
 
   # Get namespace either by parameter,
@@ -38,7 +38,7 @@ sub validate {
   warn $@ and return if $@;
 
   # Everything is fine - set schemaLocation to document
-  $root->attrs('xsi:schemaLocation' => "$ns $schema_loc");
+  $root->attr('xsi:schemaLocation' => "$ns $schema_loc");
   return $self;
 };
 

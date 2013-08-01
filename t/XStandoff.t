@@ -76,18 +76,18 @@ ok(my $segs = $cd->segmentation, 'Add segmentation');
 
 ok(my $id1 = $segs->segment(0, 4), 'Segment');
 
-is($segs->segment($id1)->attrs('start'), 0, 'Segment');
-is($segs->segment($id1)->attrs('end'), 4, 'Segment');
+is($segs->segment($id1)->attr('start'), 0, 'Segment');
+is($segs->segment($id1)->attr('end'), 4, 'Segment');
 
 ok(my $id2 = $segs->segment(5, 8), 'Segment');
 
-is($segs->segment($id2)->attrs('start'), 5, 'Segment');
-is($segs->segment($id2)->attrs('end'), 8, 'Segment');
+is($segs->segment($id2)->attr('start'), 5, 'Segment');
+is($segs->segment($id2)->attr('end'), 8, 'Segment');
 
 ok(my $id3 = $segs->segment(9, 13), 'Segment');
 
-is($segs->segment($id3)->attrs('start'), 9, 'Segment');
-is($segs->segment($id3)->attrs('end'), 13, 'Segment');
+is($segs->segment($id3)->attr('start'), 9, 'Segment');
+is($segs->segment($id3)->attr('end'), 13, 'Segment');
 
 is($segs->segment($id1)->segment_content, 'Dies', 'Correct substring');
 is($segs->segment($id2)->segment_content, 'ist', 'Correct substring');
@@ -117,12 +117,12 @@ is($segs->segment($id2)->segment_content(
 
 is($segs->segment($id3)->segment_content, 'mein', 'Correct substring');
 
-is($segs->segment($id3)->attrs('start'), 10, 'Segment');
-is($segs->segment($id3)->attrs('end'), 14, 'Segment');
+is($segs->segment($id3)->attr('start'), 10, 'Segment');
+is($segs->segment($id3)->attr('end'), 14, 'Segment');
 
 
-is($segs->segment($id3)->attrs('start'), 10, 'Segment');
-is($segs->segment($id3)->attrs('end'), 14, 'Segment');
+is($segs->segment($id3)->attr('start'), 10, 'Segment');
+is($segs->segment($id3)->attr('end'), 14, 'Segment');
 
 is($segs->segment($id5)->segment_content, 'Dies wäre mein Text.',
    'Correct substring');
@@ -136,12 +136,15 @@ ok(b($pd->textual_content)->spurt($file_name), 'Save file');
 
 ok($pd->textual_content(uri => $file_name), 'Set textual content');
 
+is($pd->at('primaryDataRef')->attr('uri'), $file_name, 'PrimaryDataRef');
 
-is($pd->at('primaryDataRef')->attrs('uri'), $file_name, 'PrimaryDataRef');
+ok($pd->textual_content(file => $file_name), 'Set textual content');
 
-is($segs->segment($id1)->attrs('start'), 0, 'Segment');
-is($segs->segment($id1)->attrs('end'), 4, 'Segment');
 
+is($segs->segment($id1)->attr('start'), 0, 'Segment');
+is($segs->segment($id1)->attr('end'), 4, 'Segment');
+
+ok($cd->textual_content, 'Textual Content is set');
 
 is($cd->segment($id1)->segment_content, 'Dies', 'Correct substring');
 is($cd->segment($id2)->segment_content, 'wäre', 'Correct substring');
