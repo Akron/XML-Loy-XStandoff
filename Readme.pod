@@ -87,7 +87,7 @@ a C<corpus> or a C<corpusData> element.
   $cd->annotation->add('level');
 
 Retrieve an C<annotation> element and set it, if it doesn't exist
-(along with a C<corpusData> element.
+(along with a C<corpusData> element).
 
 
 =head2 corpus_data
@@ -218,7 +218,7 @@ Retrieve a C<segmentation> element and set it, if it doesn't exist
 =head2 segment
 
   my $seg = $cd->segment('seg-1');
-  print $seg->attrs('start');
+  print $seg->attr('start');
 
   my $seg_id = $cd->segment(14, 20);
   my $seg_id = $cd->segment(14, 20);

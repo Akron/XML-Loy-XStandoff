@@ -6,6 +6,8 @@ lib/XML/Loy/File.pm
 lib/XML/Loy/DublinCore.pm
 lib/XML/Loy/AnaWiki/DocumentStructure.pm
 lib/XML/Loy/Schema/Validator.pm
+lib/XML/Loy/Example/Morphemes.pm
+lib/XML/Loy/Example/Syllables.pm
 t/XStandoff.t
 t/File.t
 t/Olac-DublinCore.t

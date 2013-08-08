@@ -24,6 +24,7 @@ use Scalar::Util qw/blessed/;
 # - use XML::Loy::Date::RFC3339;
 # - iso-8601
 # - mimeType => '...'
+# - Check annotations based on offset information
 
 our $UUID;
 BEGIN { $UUID = Data::UUID->new };
