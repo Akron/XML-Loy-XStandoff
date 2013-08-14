@@ -5,12 +5,11 @@ use XML::Loy with => (
   namespace => 'http://sojolicio.us/ns/xml-loy'
 );
 
-use Carp qw/carp/;
 
 # Constructor
 sub new {
   my $class = shift;
-  my $file = shift;
+  my $file  = shift;
 
   return $class->SUPER::new unless $file;
 
@@ -36,6 +35,8 @@ sub file {
     if ($_[0]) {
       return $root->[2]->{'loy:file'} = shift;
     }
+
+    # Unset file name
     else {
       return delete $root->[2]->{'loy:file'};
     };
@@ -56,9 +57,8 @@ sub save {
   # Remember filename
   $self->file($file) unless $self->file;
 
-
   # Create new bytestream
-  my $byte = Mojo::ByteStream->new($self->root->to_pretty_xml);
+  my $byte = Mojo::ByteStream->new( $self->root->to_pretty_xml );
 
   # Save data to filesystem
   return $byte->spurt( $file );
@@ -83,16 +83,19 @@ sub load {
 };
 
 
+# Delete file
 sub delete {
   my $self = shift;
 
   # Get file name
   my $file = shift || $self->file || return;
 
-  unlink $file;
+  if (unlink $file) {
+    $self->file('');
+    return 1;
+  };
 
-  $self->file
-
+  return;
 };
 
 
