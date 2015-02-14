@@ -10,6 +10,7 @@ ok(my $doc = $corpus->textual_content('Give me the hammer!'), 'Create Textual Co
 
 ok($corpus->segmentation, 'Create Segmentation');
 ok(my $data = $corpus->layer->extension('-AnaWiki::DocumentStructure'), 'Create doc structure');
+
 ok(my $sentence = $data->ds_para->ds_sentence, 'Add sentence');
 
 ok($corpus->extension('-XStandoff::Tokenizer'), 'Add tokenizer extension');

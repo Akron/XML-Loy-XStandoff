@@ -1,15 +1,19 @@
-0.04 2013-08-01
+0.5 2015-02-14
+        - Update for XML::Loy 0.36 and
+	  Mojolicious 5.79.
+
+0.4 2013-08-01
         - Update for XML::Loy 0.19 and
 	  Mojolicious 4.23.
 
-0.03 2013-07-11
+0.3 2013-07-11
         - Bundle example extensions for
 	  Morphemes and Syllables.
 
-0.02 2013-04-23
+0.2 2013-04-23
         - Changed API for segment_content.
 	- Fixed bug in primary data count.
         - Initial release to GitHub.
 
-0.01 2013-04-11
+0.1 2013-04-11
         - Initial submission to Git Repository.

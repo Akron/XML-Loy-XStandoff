@@ -28,7 +28,7 @@ sub dc {
   }
 
   else {
-    my @array = $self->children('dc:' . $name)->pluck('text')->each;
+    my @array = $self->children('dc:' . $name)->map('text')->each;
     return $array[0] unless wantarray;
     return @array;
   };

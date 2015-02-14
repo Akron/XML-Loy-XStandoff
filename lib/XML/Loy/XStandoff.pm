@@ -10,7 +10,7 @@ use XML::Loy with => (
   }
 );
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 use XML::Loy::XStandoff::Data;
 use XML::Loy::File;
@@ -191,7 +191,7 @@ sub layer {
 
   $self = $self->at('*') unless $self->type;
 
-  if ($self->type =~ /^(?:xsf:)?(corpus(?:Data)?|level|annotation)?$/) {
+  if ($self->type =~ /^(?:xsf:)?(corpus(?:Data)?|annotation)?$/) {
     $self = ($self->at('level') or $self->level( id => 'lev-' . $UUID->create_str ));
   }
   else {
@@ -363,7 +363,7 @@ sub _ref_type {
 	$data_obj->on(
 	  on_change => sub {
 	    my $d = shift;
-	    $data->replace_content($d->string);
+	    $data->content($d->string);
 	  }
 	);
 
@@ -441,7 +441,7 @@ sub _ref_type {
 	$data_obj->on(
 	  on_change => sub {
 	    my $d = shift;
-	    $data->replace_content($d->string);
+	    $data->content($d->string);
 	  }
 	);
 
@@ -465,12 +465,12 @@ sub _ref_type {
       $data = b( $param{file} )->slurp;
       # Is a document
       if ($type ne 'raw') {
-	$self->find($content_ref)->pluck('remove');
+	$self->find($content_ref)->map('remove');
 	return $self->set($content)->add( $self->new($data) );
       };
     }
     elsif ($param{'uri'}) {
-      $self->find($content)->pluck('remove');
+      $self->find($content)->map('remove');
 
       return $self->set($content_ref => { uri => $param{uri} });
     };
@@ -479,7 +479,7 @@ sub _ref_type {
     $data = shift;
   };
 
-  $self->find($content_ref)->pluck('remove');
+  $self->find($content_ref)->map('remove');
   return $self->set($content => {} => $data);
 };
 
@@ -779,7 +779,7 @@ L<XStandoff.net|http://xstandoff.net/>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2015, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

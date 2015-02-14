@@ -16,7 +16,9 @@ sub ds_title {
 
 
 # Add or get paragraphs
-sub ds_para { shift->_ds(paragraph => @_) };
+sub ds_para {
+  shift->_ds(paragraph => @_)
+};
 
 
 # Add or get sentences
