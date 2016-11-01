@@ -12,6 +12,7 @@ $p->ds_sentence("And my second sentence");
 $p->ds_sentence({ 'xml:id' => 's-3' } => "My final sentence");
 
 is($p->ds_sentence(pos => 2)->text, 'And my second sentence', 'Second sentence');
+
 is($p->ds_sentence(id => 's-3')->text, 'My final sentence', 'Last sentence');
 
 # diag $ds->to_pretty_xml;

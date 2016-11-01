@@ -24,7 +24,7 @@ sub ds_para {
 # Add or get sentences
 sub ds_sentence {
   my $self = shift;
-  return unless $self->type =~ /^(ds:)?paragraph$/;
+  return unless $self->tag =~ /^(ds:)?paragraph$/;
   $self->_ds(sentence => @_)
 };
 
@@ -32,7 +32,7 @@ sub ds_sentence {
 # Add or get words
 sub ds_word {
   my $self = shift;
-  return unless $self->type =~ /^(ds:)?sentence$/;
+  return unless $self->tag =~ /^(ds:)?sentence$/;
   $self->_ds(word => @_)
 };
 

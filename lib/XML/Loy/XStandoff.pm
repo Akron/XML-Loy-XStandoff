@@ -10,7 +10,7 @@ use XML::Loy with => (
   }
 );
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 use XML::Loy::XStandoff::Data;
 use XML::Loy::File;
@@ -36,7 +36,7 @@ sub corpus_data {
   my $self = shift;
 
   # Get first element if no type defined
-  $self = $self->at('*') unless $self->type;
+  $self = $self->at('*') unless $self->tag;
 
   # Get corpus data
   unless ($_[1]) {
@@ -62,19 +62,20 @@ sub primary_data {
   my $self = shift;
 
   # Get first node if not there
-  $self = $self->at('*') unless $self->type;
+  $self = $self->at('*') unless $self->tag;
 
-  if ($self->type =~ /^(?:xsf:)?corpus$/) {
+  if ($self->tag =~ /^(?:xsf:)?corpus$/) {
     $self = (
       $self->at('corpusData') ||
-	$self->corpus_data( id => 'cd-' . $UUID->create_str )
+        $self->corpus_data( id => 'cd-' . $UUID->create_str )
       );
   };
 
   # Climb up the tree
-  while ($self->type !~ /^(?:xsf:)?corpusData$/) {
+  while ($self->tag !~ /^(?:xsf:)?corpusData$/) {
     $self = $self->parent or return;
   };
+
 
   # Get primary data
   unless ($_[1]) {
@@ -93,13 +94,13 @@ sub primary_data {
 sub textual_content {
   my $self = shift;
 
-  $self = $self->at('*') unless $self->type;
+  $self = $self->at('*') unless $self->tag;
 
-  if ($self->type =~ /^(?:xsf:)?corpus(?:Data)?$/) {
+  if ($self->tag =~ /^(?:xsf:)?corpus(?:Data)?$/) {
     $self = ($self->at('primaryData') or $self->primary_data( id => 'pd-' . $UUID->create_str ));
   }
   else {
-    while ($self->type !~ /^(?:xsf:)?primaryData$/) {
+    while ($self->tag !~ /^(?:xsf:)?primaryData$/) {
       $self = $self->parent or return;
     };
   };
@@ -126,13 +127,13 @@ sub textual_content {
 sub segmentation {
   my $self = shift;
 
-  $self = $self->at('*') unless $self->type;
+  $self = $self->at('*') unless $self->tag;
 
-  if ($self->type =~ /^(?:xsf:)?corpus$/) {
+  if ($self->tag =~ /^(?:xsf:)?corpus$/) {
     $self = ($self->at('corpusData') or $self->corpus_data( id => 'cd-' . $UUID->create_str ));
   }
   else {
-    while ($self->type !~ /^(?:xsf:)?corpusData$/) {
+    while ($self->tag !~ /^(?:xsf:)?corpusData$/) {
       $self = $self->parent or return;
     };
   };
@@ -145,13 +146,13 @@ sub segmentation {
 sub annotation {
   my $self = shift;
 
-  $self = $self->at('*') unless $self->type;
+  $self = $self->at('*') unless $self->tag;
 
-  if ($self->type =~ /^(?:xsf:)?corpus$/) {
+  if ($self->tag =~ /^(?:xsf:)?corpus$/) {
     $self = ($self->at('corpusData') or $self->corpus_data( id => 'cd-' . $UUID->create_str ));
   }
   else {
-    while ($self->type !~ /^(?:xsf:)?corpusData$/) {
+    while ($self->tag !~ /^(?:xsf:)?corpusData$/) {
       $self = $self->parent or return;
     };
   };
@@ -163,13 +164,13 @@ sub annotation {
 sub level {
   my $self = shift;
 
-  $self = $self->at('*') unless $self->type;
+  $self = $self->at('*') unless $self->tag;
 
-  if ($self->type =~ /^(?:xsf:)?corpus(?:Data)?$/) {
+  if ($self->tag =~ /^(?:xsf:)?corpus(?:Data)?$/) {
     $self = $self->annotation;
   };
 
-  while ($self->type !~ /^(?:xsf:)?annotation$/) {
+  while ($self->tag !~ /^(?:xsf:)?annotation$/) {
     $self = $self->parent or return;
   };
 
@@ -189,13 +190,13 @@ sub level {
 sub layer {
   my $self = shift;
 
-  $self = $self->at('*') unless $self->type;
+  $self = $self->at('*') unless $self->tag;
 
-  if ($self->type =~ /^(?:xsf:)?(corpus(?:Data)?|annotation)?$/) {
+  if ($self->tag =~ /^(?:xsf:)?(corpus(?:Data)?|annotation)?$/) {
     $self = ($self->at('level') or $self->level( id => 'lev-' . $UUID->create_str ));
   }
   else {
-    while ($self->type !~ /^(?:xsf:)?level$/) {
+    while ($self->tag !~ /^(?:xsf:)?level$/) {
       $self = $self->parent or return;
     };
   };
@@ -215,9 +216,9 @@ sub segment {
   if (@_ == 1) {
     my $id = shift;
 
-    unless ($self->type =~ /^(?:xsf:)?segmentation/) {
-      while ($self->type !~ /^(?:xsf:)?corpusData$/) {
-	$self = $self->parent or return;
+    unless ($self->tag =~ /^(?:xsf:)?segmentation/) {
+      while ($self->tag !~ /^(?:xsf:)?corpusData$/) {
+        $self = $self->parent or return;
       };
     };
 
@@ -229,7 +230,8 @@ sub segment {
     my $end   = pop;
     my $start = pop;
     my $id    = shift || 'seg-' . $UUID->create_str;
-    if (my $seg = $self->at("segment[xml\:id=$id]")) {
+
+    if (my $seg = $self->at("segment[xml\\:id=$id]")) {
       $seg->attr(start => $start);
       $seg->attr(end => $end);
       return $id;
@@ -238,12 +240,12 @@ sub segment {
       my $segs = $self->segmentation;
 
       if ($segs->add(segment => {
-	'xml:id' => $id,
-	'start'  => $start,
-	'end'    => $end,
-	'type'   => 'char'
+        'xml:id' => $id,
+        'start'  => $start,
+        'end'    => $end,
+        'type'   => 'char'
       })) {
-	return $id;
+        return $id;
       };
     };
   };
@@ -270,7 +272,7 @@ sub segment_content {
   my $replace = shift;
 
   my ($id, $seg);
-  if ($self->type =~ /^(?:xsf:)?segment$/) {
+  if ($self->tag =~ /^(?:xsf:)?segment$/) {
     $seg = $self;
   }
   else {
@@ -779,7 +781,7 @@ L<XStandoff.net|http://xstandoff.net/>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2015, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2016, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

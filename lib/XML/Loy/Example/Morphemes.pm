@@ -14,7 +14,7 @@ sub morphemes {
 # Add morphemes
 sub morpheme {
   my $self = shift;
-  return unless $self->type =~ /^(?:morph:)?morphemes$/;
+  return unless $self->tag =~ /^(?:morph:)?morphemes$/;
   return $self->add(morpheme => @_);
 };
 

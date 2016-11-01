@@ -5,7 +5,7 @@ use utf8;
 sub tokenize {
   my $self = shift;
 
-  while ($self->type !~ /^(?:xsf:)?corpusData$/) {
+  while ($self->tag !~ /^(?:xsf:)?corpusData$/) {
     $self = $self->parent or return;
   };
 

@@ -14,7 +14,7 @@ sub syllables {
 # Add morphemes
 sub syllable {
   my $self = shift;
-  return unless $self->type =~ /^(?:syll:)?syllables$/;
+  return unless $self->tag =~ /^(?:syll:)?syllables$/;
   return $self->add(syllable => @_);
 };
 
