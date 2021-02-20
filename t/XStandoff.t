@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Warn;
+use Mojo::File 'path';
 use Mojo::ByteStream 'b';
 use File::Temp qw/:POSIX/;
 use utf8;
@@ -129,11 +130,11 @@ is($segs->segment($id5)->segment_content, 'Dies wäre mein Text.',
    'Correct substring');
 
 
-my $data = b($FindBin::Bin . '/files/text.txt')->slurp;
+my $data = path($FindBin::Bin . '/files/text.txt')->slurp;
 
 my $file_name = tmpnam();
 
-ok(b($pd->textual_content)->spurt($file_name), 'Save file');
+ok(path($file_name)->spurt($pd->textual_content), 'Save file');
 
 ok($pd->textual_content(uri => $file_name), 'Set textual content');
 

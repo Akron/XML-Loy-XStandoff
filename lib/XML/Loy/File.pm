@@ -1,8 +1,9 @@
 package XML::Loy::File;
-use Mojo::ByteStream;
+use Mojo::ByteStream 'b';
+use Mojo::File 'path';
 use XML::Loy with => (
   prefix    => 'loy',
-  namespace => 'http://sojolicio.us/ns/xml-loy'
+  namespace => 'http://sojolicious.example/ns/xml-loy'
 );
 
 
@@ -13,7 +14,7 @@ sub new {
 
   return $class->SUPER::new unless $file;
 
-  my $data = Mojo::ByteStream->new($file)->slurp->decode->encode->to_string;
+  my $data = b(path($file)->slurp)->decode->encode->to_string;
 
   my $self = $class->SUPER::new($data);
   $self->file($file);
@@ -57,11 +58,8 @@ sub save {
   # Remember filename
   $self->file($file) unless $self->file;
 
-  # Create new bytestream
-  my $byte = Mojo::ByteStream->new( $self->root->to_pretty_xml );
-
   # Save data to filesystem
-  return $byte->spurt( $file );
+  return path($file)->spurt($self->root->to_pretty_xml);
 };
 
 

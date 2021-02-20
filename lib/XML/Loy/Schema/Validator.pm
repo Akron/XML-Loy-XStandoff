@@ -62,8 +62,8 @@ XML::Loy::Schema::Validator - Validate Documents using XML Schema
   $doc->add(name => 'Peter' => { 'xml:id' => 'n-1' });
 
   if ($doc->validate(
-        'http://sojolicious/ns/loy',
-        'http://sojolicious/ns/loy.xsd'
+        'http://sojolicious.example/ns/loy',
+        'http://sojolicious.example/ns/loy.xsd'
       )) {
     print "Everything is fine!\n"
   };
@@ -86,11 +86,11 @@ from L<XML::Loy> and implements the following new ones.
 =head2 validate
 
   my $doc = $doc->validate(
-    'http://sojolicious/ns/loy',
-    'http://sojolicious/ns/loy.xsd'
+    'http://sojolicious.example/ns/loy',
+    'http://sojolicious.example/ns/loy.xsd'
   );
 
-  if (my $doc = $doc->validate('http://sojolicious/ns/loy.xsd')) {
+  if (my $doc = $doc->validate('http://sojolicious.example/ns/loy.xsd')) {
     print $doc->to_pretty_xml;
   };
 

@@ -10,11 +10,12 @@ use XML::Loy with => (
   }
 );
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 use XML::Loy::XStandoff::Data;
 use XML::Loy::File;
 use Mojo::ByteStream 'b';
+use Mojo::File 'path';
 use Mojo::UserAgent;
 use Carp qw/carp/;
 use Data::UUID;
@@ -390,7 +391,7 @@ sub _ref_type {
 
 	  # Load file
 	  $data = XML::Loy::XStandoff::Data->new(
-	    b($ref)->slurp->decode->to_string
+	    b(path($ref)->slurp)->decode->to_string
 	  );
 
 	  # Set file information
@@ -464,7 +465,7 @@ sub _ref_type {
   my $data;
   if (exists $param{file} || exists $param{uri}) {
     if ($param{file}) {
-      $data = b( $param{file} )->slurp;
+      $data = path( $param{file} )->slurp;
       # Is a document
       if ($type ne 'raw') {
 	$self->find($content_ref)->map('remove');
@@ -781,7 +782,7 @@ L<XStandoff.net|http://xstandoff.net/>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2021, L<Nils Diewald|https://www.nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

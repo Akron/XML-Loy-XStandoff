@@ -1,3 +1,7 @@
+0.7 2021-02-20
+        - Update for XML::Loy 0.50 and
+          Mojolicious 9.
+
 0.6 2016-11-01
         - Update for XML::Loy 0.46 and
           Mojolicious 7.09. 
